@@ -131,9 +131,6 @@ function tokenizer(input) {
         char = input[++current];
       }
 
-      // Skip the closing double quote.
-      char = input[++current];
-
       // And add our `string` token to the `tokens` array.
       tokens.push({ type: 'feature_ref', value });
 
@@ -149,9 +146,14 @@ function tokenizer(input) {
 
       // Then we'll iterate through each character until we reach another
       // double quote.
-      while (char !== '"') {
+      var prev;
+      while (prev === "\\" || char !== '"') {
         value += char;
+        prev = char;
         char = input[++current];
+        if(char === undefined) {
+          throw "Missing closing quote";
+        }
       }
 
       // Skip the closing double quote.
@@ -188,7 +190,8 @@ function tokenizer(input) {
 	return tokens;
 }
 
-function parser(tokens) {
+function parser(tokens, depth) {
+  depth = depth || 0;
 
   // Again we keep a `current` variable that we will use as a cursor.
   let current = 0;
@@ -199,11 +202,23 @@ function parser(tokens) {
 
     // Inside the walk function we start by grabbing the `current` token.
     let token = tokens[current];
+    let prevToken = tokens[current-1];
+
+    var prevIsSep = (
+      !prevToken
+      || prevToken.type === "arg_sep"
+      || prevToken.type === "paren"
+    )
 
 
     if(token.type === "arg_sep") {
       token = tokens[++current];
     }
+    else if(!prevIsSep) {
+      throw "Expecting argument separator";
+    }
+
+
 
     // We're going to split each type of token off into a different code path,
     // starting off with `number` tokens.
@@ -289,8 +304,11 @@ function parser(tokens) {
       token = tokens[++current];
 
       while (
-        (token.type !== 'paren') ||
-        (token.type === 'paren' && token.value !== ')')
+        token && 
+        (
+          (token.type !== 'paren') ||
+          (token.type === 'paren' && token.value !== ')')
+        )
       ) {
         // we'll call the `walk` function which will return a `node` and we'll
         // push it into our `node.params`.
@@ -298,8 +316,12 @@ function parser(tokens) {
         token = tokens[current];
       }
 
-      // Finally we will increment `current` one last time to skip the closing
-      // parenthesis.
+
+      if(!token || token.type !== "paren") {
+        throw "Missing paren"
+      }
+
+      // Skip the closing parenthesis.
       current++;
 
       // And return the node.
@@ -308,7 +330,6 @@ function parser(tokens) {
 
     // Again, if we haven't recognized the token type by now we're going to
     // throw an error.
-    console.log("error", token)
     throw new TypeError(token.type);
   }
 
@@ -321,6 +342,10 @@ function parser(tokens) {
 
   while (current < tokens.length) {
     ast.body.push(walk());
+  }
+
+  if(depth === 0 && ast.body.length > 1) {
+    throw "Only allowed one top level expression";
   }
 
   // At the end of our parser we'll return the AST.
@@ -350,7 +375,12 @@ function transformer(nodes) {
     }
   }
 
-  return walk(nodes.body[0]);
+  if(nodes.body.length < 1) {
+    return [];
+  }
+  else {
+    return walk(nodes.body[0]);
+  }
 }
 
 function compiler(input) {
