@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "yargs": "^10.0.3"
+  },
+  "devDependencies": {
+    "mocha": "^4.0.1"
+  }
+}
