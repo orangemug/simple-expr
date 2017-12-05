@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 var fs         = require("fs");
 var yargs      = require("yargs");
 var simpleExpr = require("../");
