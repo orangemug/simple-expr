@@ -10,7 +10,6 @@ Simple expression language for [mapbox-gl-js expressions][mapbox-gl-expressions]
 ‼️ This is an experimental repository, if you find it useful or interesting please leave a comment. There is a general discussion issue in [issue #1](https://github.com/orangemug/simple-expr/issues/1), leave any general thoughts there. Or [open a new issue](https://github.com/orangemug/simple-expr/issues/new) for bugs or to suggest new features.
 
 
-
 The primary aim of this language is to support [MapboxGL expressions][mapbox-gl-expressions], although it should also be generally useful.
 
 This is a tiny functional language that gets converted into [MapboxGL expressions][mapbox-gl-expressions]. The idea behind the language is that it can be converted in a lossless way between [MapboxGL expressions][mapbox-gl-expressions] and back again.
