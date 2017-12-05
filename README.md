@@ -137,35 +137,44 @@ You can parse, compile to json and even run it as javascript. It comes in 2 form
 
 ## JS API
 
+### Compile to expression JSON
 ```js
-import simpleExpr from 'simple-expr';
-
-out = simpleExpr.parse('concat("hello", " ", "world")')
-assert.equal(out, {
-  {
-    type: "function",
-    name: "concat",
-    args: [
-      {type: "string", value: "hello"},
-      {type: "string", value: " "},
-      {type: "string", value: "world"}
-    ]
-  }
-})
-
-out = simpleExpr.compile('concat("hello", " ", "world")', {format: "json"})
-assert.equal(out, [
+var simpleExpr = require("simple-expr");
+var out = simpleExpr.compiler('concat("hello", " ", "world")', {format: "json"})
+assert.deepEqual(out, [
   "concat", "hello", " ", "world"
 ])
+```
 
-out = simpleExpr.compile('concat("hello", " ", "world")', {format: "js"})
-assert.equal(out, "function concat() {Array.prototype.slice.call(arguments, 0).join("")}; function() {concat("Hello", " ", "world")}")
+### Parse to AST
 
-out = simpleExpr.exec('concat("hello", " ", get("name"))', {
-  /* data... */
-  name: "Mary"
+```js
+var simpleExpr = require("simple-expr");
+var tokens = simpleExpr.tokenizer('concat("hello", " ", "world")')
+var ast = simpleExpr.parser(tokens);
+assert.deepEqual(ast, {
+  "type": "Program",
+  "body": [
+    {
+      "type": "CallExpression",
+      "name": "concat",
+      "params": [
+        {
+          "type": "StringLiteral",
+          "value": "hello"
+        },
+        {
+          "type": "StringLiteral",
+          "value": " "
+        },
+        {
+          "type": "StringLiteral",
+          "value": "world"
+        }
+      ]
+    }
+  ]
 })
-assert.equal(out, "Hello Mary")
 ```
 
 
