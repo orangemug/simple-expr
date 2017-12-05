@@ -51,7 +51,8 @@ var EXAMPLES = [
     code: [
       "interpolate(",
       "  linear(), zoom()",
-      "  2, rgb(255, 0, 0),",
+      "  0, rgb(0, 0, 0),",
+      "  11, rgb(255, 0, 0),",
       "  16, rgb(0, 255, 0),",
       "  22, rgb(0, 0, 255)",
       ")"
