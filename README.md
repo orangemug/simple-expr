@@ -1,4 +1,4 @@
-# simple-expr
+# simple-expr
 A expression grammer.
 
 [![stability-unstable](https://img.shields.io/badge/stability-unstable-yellow.svg)][stability]
