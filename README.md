@@ -1,5 +1,5 @@
 # simple-expr
-A expression grammer.
+Simple expression language for mapbox-gl-js expressions
 
 [![stability-unstable](https://img.shields.io/badge/stability-unstable-yellow.svg)][stability]
 [![Build Status](https://circleci.com/gh/orangemug/simple-expr.png?style=shield)][circleci]
@@ -8,11 +8,15 @@ A expression grammer.
 [circleci]:    https://circleci.com/gh/orangemug/simple-expr
 
 
-The primary aim is the for the [mapbox-gl style spec expressions](https://www.mapbox.com/mapbox-gl-js/style-spec#expressions).
+The primary aim of this language is to support [MapboxGL expressions][mapbox-gl-expressions], although it should also be generally useful.
 
-You can see a demo here: <https://orangemug.github.io/simple-expr>
+This is a tiny functional language that get converted into [MapboxGL expressions][mapbox-gl-expressions]. The idea behind the language is that it can be converted in a lossless way between the languages and [MapboxGL expressions][mapbox-gl-expressions].
+
+
+**Demo:**: <https://orangemug.github.io/simple-expr>
 
 **Note:** This is super alpha software
+
 
 ## Install
 To install
@@ -23,68 +27,113 @@ npm install orangemug/simple-expr --save
 
 
 ## Syntax
-You can have any number of `let` statements at the start of your expression. Let statements assign a value to a variable. You can reference these variables with a `&` prefix. For example `&foo`.
+The aim of the syntax is to be a simple, you are only allowed to define a single top level expression.
 
-Any data passed in to the exprssion will be available prefixed with `@`. For example `{rank: 1}` would be available as `@rank` in the expression.
-
-The functions come straight from the mapbox gl spec. A full example would be
-
+**Valid**
 ```
-&foo = "Hello"
-&bar = "World"
-
-concat(&foo, " ", &bar)
+rgb(255, 0, 0)
 ```
 
-Defining constants after the expression is not allowed, but is allowed inside sub-expressions.
-
+**Invalid!**
 ```
-&foo = "Hello";
-&bar = "World";
-
-concat(&foo, {
-  &bar = "Mary";
-
-  return &bar
-})
+rgb(255, 0, 0)
+rgb(0, 0, 255)
 ```
 
-Sub-expressions are here so we can support the spec properly and there use is discouraged.
-
-Note that you can call arithmatic in one of 2 ways
+Although sub expressions are allowed
 
 ```
-return +(1, 2)
+rgb(get("rank"), 0, 0)
 ```
 
-Or the prefered way 
+
+### Types
+There are 2 basic types
+
+
+#### number
+Any integer or decimal number not in quotes, for example
 
 ```
-return 1 + 2
+1
+-1
++3
+3.14
+-1000
+-9.8
 ```
 
-Arithmatic expression is not supported and will throw an error. For example
+
+#### string
+Any characters surrounded in quotes, for example
 
 ```
-return 3 + 2 * @rank
+"foo bar"
 ```
 
-Would need to become either `3 + (2 * @rank)` or `(3 + 2) * @rank`.
-
-The same applies to conditionals
+You can excape quotes with `\\` for example
 
 ```
-return @rank == 1 == @name
+"They said \"it couldn't be done\""
 ```
 
-Would need to become either `(@rank == 1) == @name` or `(@rank == (1 == @name))`
+
+### Functions
+Functions are defined as
+
+```
+function_name(arg, arg, arg...)
+```
+
+Note that arguments can also be functions. This gets compiled into the [MapboxGL expressions][mapbox-gl-expressions] JSON format.
+
+Lets see an example
+
+```
+rgb(get("rating"), 0, 0)
+```
+
+Will become
+
+```
+["rgb", ["get", "rating"], 0, 0]
+```
 
 
+### Feature references
+As well as using the `get` function there is also a shothand to reference feature data. The following
 
+```
+rgb(@rating, 0, 0)
+```
+
+Is the same as
+
+```
+rgb(get("rating"), 0, 0)
+```
+
+
+### Variables
+**NOTE: Not yet available**
+You can also define variables before the expressions. Variables are also allowed to define a single expression. A quick example
+
+```
+&r = interpolate(
+  linear(), @score,
+  1, 100
+  22, 255
+)
+
+rgb(&r, 0, 0)
+```
+
+Variables **must** start with a `&` both in there defintion and their usage.
 
 
 ## Usage
 You can parse, compile to json and even run it as javascript. It comes in 2 forms, the CLI (command line interface) and the javascript API
+
 
 ## JS API
 
@@ -121,6 +170,7 @@ assert.equal(out, "Hello Mary")
 
 
 ## CLI
+**NOTE: Not yet available**
 
 ```
 $ maputnik-expr parse input.expr
@@ -131,34 +181,7 @@ $ maputnik-expr run --d rank=1 zoom=1.1 input.expr
 ```
 
 
-## Todo
-
- - Get rid of the need for `;`
- - Make javascript runner
-
-
-```
-case(
-  ==(@type, "foo"), rgb(255, 0, 0),
-  ==(@type, "bar"), rgb(0, 255, 0),
-  rgb(0, 0, 255)
-)
-```
-
-```
-&line_width = 2
-
-*(@rank, &line_width)
-```
-
-```
-[
-  "let", ["line_width", 2],
-  ["*", ["var", "rank"], ["var", "line_width"]]
-]
-```
-
-
 ## License
 [MIT](LICENSE)
 
+[mapbox-gl-expressions]: (https://www.mapbox.com/mapbox-gl-js/style-spec#expressions)
