@@ -10,6 +10,9 @@ A expression grammer.
 
 The primary aim is the for the [mapbox-gl style spec expressions](https://www.mapbox.com/mapbox-gl-js/style-spec#expressions).
 
+You can see a demo here: <https://orangemug.github.io/simple-expr>
+
+**Note:** This is super alpha software
 
 ## Install
 To install
