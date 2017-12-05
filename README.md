@@ -1,10 +1,10 @@
 # simple-expr
 Simple expression language for mapbox-gl-js expressions
 
-[![stability-unstable](https://img.shields.io/badge/stability-unstable-yellow.svg)][stability]
+[![stability-experimental](https://img.shields.io/badge/stability-experimental-orange.svg)][stability]
 [![Build Status](https://circleci.com/gh/orangemug/simple-expr.png?style=shield)][circleci]
 
-[stability]:   https://github.com/orangemug/stability-badges#unstable
+[stability]:   https://github.com/orangemug/stability-badges#experimental
 [circleci]:    https://circleci.com/gh/orangemug/simple-expr
 
 
