@@ -85,7 +85,7 @@ You can parse, compile to json and even run it as javascript. It comes in 2 form
 
 ## JS API
 
-```
+```js
 import simpleExpr from 'simple-expr';
 
 out = simpleExpr.parse('concat("hello", " ", "world")')
