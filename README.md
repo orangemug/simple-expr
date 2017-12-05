@@ -1,5 +1,5 @@
 # simple-expr
-Simple expression language for mapbox-gl-js expressions
+Simple expression language for [mapbox-gl-js expressions][mapbox-gl-expressions]
 
 [![stability-experimental](https://img.shields.io/badge/stability-experimental-orange.svg)][stability]
 [![Build Status](https://circleci.com/gh/orangemug/simple-expr.png?style=shield)][circleci]
