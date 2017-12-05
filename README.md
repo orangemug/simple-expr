@@ -210,7 +210,7 @@ assert.deepEqual(ast, {
 The available CLI commands are
 
 ### Parse
-```
+```bash
 simple-expr parse examples/concat.expr > /tmp/concat.ast
 ## >>/tmp/concat.ast
 ## {
@@ -240,7 +240,7 @@ simple-expr parse examples/concat.expr > /tmp/concat.ast
 ```
 
 ### Compile
-```
+```bash
 simple-expr compile examples/concat.expr > /tmp/concat.json
 ## >>/tmp/concat.json
 ## [
@@ -256,7 +256,7 @@ simple-expr compile examples/concat.expr > /tmp/concat.json
 ```
 
 ### Decompile
-```
+```bash
 simple-expr decompile examples/concat.json > /tmp/concat.expr
 ## >>/tmp/concat.expr
 ## concat("Hello", " ", @name)
@@ -264,7 +264,7 @@ simple-expr decompile examples/concat.json > /tmp/concat.expr
 ```
 
 ### Execute
-```
+```bash
 simple-expr execute --feature-props name=Maputnik examples/concat.expr > /tmp/concat.log
 ## >>/tmp/concat.log
 ## Hello Maputnik
