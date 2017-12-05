@@ -4,89 +4,148 @@ var simpleExpr = require("../");
 
 const tests = [
   {
-    name: "non-spec",
-    opts: {
-      typeCheck: false
-    },
+    name: "number: integer",
     input: `
-      foo(1, "a", bar("2", "b", baz()))
+      number(1)
+    `,
+    output: ["number", 1]
+  },
+  {
+    name: "number: integer (with +sign)",
+    input: `
+      number(+1)
+    `,
+    output: ["number", 1]
+  },
+  {
+    name: "number: integer (with -sign)",
+    input: `
+      number(-1)
+    `,
+    output: ["number", -1]
+  },
+  {
+    name: "number: float",
+    input: `
+      number(3.14)
+    `,
+    output: ["number", 3.14]
+  },
+  {
+    name: "number: float (with +sign)",
+    input: `
+      number(+3.14)
+    `,
+    output: ["number", 3.14]
+  },
+  {
+    name: "number: float (with -sign)",
+    input: `
+      number(-3.14)
+    `,
+    output: ["number", -3.14]
+  },
+  {
+    name: "number: float (invalid)",
+    input: `
+      number(3.14.3)
+    `,
+    throw: true
+  },
+  {
+    name: "string: simple",
+    input: `
+      string("hello")
+    `,
+    output: ["string", "hello"]
+  },
+  {
+    name: "string: escaped",
+    input: `
+      string("\\\"")
+    `,
+    output: ["string", "\\\""]
+  },
+  {
+    name: "string: missing quote",
+    input: `
+    concat("Hello", "world)
+    `,
+    throw: true
+  },
+  {
+    name: "function: single arg",
+    input: `
+      foo(1)
     `,
     output: [
-      "foo",
-      1,
-      "a",
-      [
-        "bar",
-        "2",
-        "b",
-        ["baz"]
-      ]
+      "foo", 1
     ]
   },
   {
-    name: "number arg function",
+    name: "function: multiple args",
     input: `
-    rgb(100,100,100)
+      foo(1, "2", 3, "four")
     `,
     output: [
-      "rgb", 100, 100, 100
+      "foo", 1, "2", 3, "four"
     ]
   },
   {
-    name: "missing arg separator",
+    name: "function: nested function",
+    input: `
+      foo(1, "2", bar(3, baz("four")))
+    `,
+    output: [
+      "foo", 1, "2", ["bar", 3, ["baz", "four"]]
+    ]
+  },
+  {
+    name: "function: multiple top-level functions",
+    input: `
+      foo()
+      bar()
+    `,
+    throw: true
+  },
+  {
+    name: "function: no top-level function",
+    input: `
+    `,
+    output: [
+    ]
+  },
+  {
+    name: "function: missing arg separator",
     input: `
     concat("hello" "world")
     `,
     throw: true,
   },
   {
-    name: "multiple expressions",
+    name: "function: context references",
     input: `
-    concat("hello" "world")
-    concat("hello" "world")
-    `,
-    throw: true,
-  },
-  {
-    name: "string arg function",
-    input: `
-    concat("hello", " ", "world")
+    rgb(@score, @rank, 0) 
     `,
     output: [
-      "concat", "hello", " ", "world"
+      "rgb", ["get", "score"], ["get", "rank"], 0
     ]
   },
   {
-    name: "nested functions",
+    name: "function: context references (alt)",
     input: `
-    concat(get("name"), " ", get("rank"))
+    rgb(0, @score, @rank) 
     `,
     output: [
-      "concat", ["get", "name"], " ", ["get", "rank"]
+      "rgb", 0, ["get", "score"], ["get", "rank"]
     ]
   },
   {
-    name: "variables",
+    name: "function: missing paren",
     input: `
-    &foo = 1
-    &bar = 2
-    add(&foo, &bar) 
+    rgb(0, @score, @rank
     `,
-    output: [
-      "let",
-      "foo", 1,
-      "bar", 2,
-      ["add", ["var", "foo"], ["var", "bar"]]
-    ]
-  },
-  {
-    name: "expression nesting",
-    input: `
-    *(/(1, 3), 4)
-    `,
-    output: [
-      "*", ["/", 1, 3], 4
-    ]
+    throw: true
   },
 ]
 
@@ -94,7 +153,7 @@ const tests = [
 describe("simple-expr", function() {
   describe("parse", function() {
     tests.forEach(function(test) {
-      it(test.name, function() {
+      function fn() {
         var err, out;
         try {
           out = simpleExpr.compiler(test.input);
@@ -107,12 +166,22 @@ describe("simple-expr", function() {
           assert(err);
         }
         else if(err) {
-          throw "Unexpected error: "+err;
+          throw err;
         }
         else {
           assert.deepEqual(out, test.output)
         }
-      })
+      }
+
+      if(test.only) {
+        it.only(test.name, fn);
+      }
+      else if(test.skip) {
+        it.skip(test.name, fn);
+      }
+      else {
+        it(test.name, fn);
+      }
     })
   })
 
