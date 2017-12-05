@@ -148,7 +148,62 @@ const tests = [
     `,
     throw: true
   },
+  {
+    name: "function: with numbers",
+    input: `
+    log10(1)
+    `,
+    output: [
+      "log10", 1
+    ]
+  },
+  {
+    name: "function: with starting number",
+    input: `
+    1func(1)
+    `,
+    throw: true
+  },
+  {
+    name: "function: with dashes",
+    input: `
+    to-color(1)
+    `,
+    output: [
+      "to-color", 1
+    ]
+  },
 ]
+
+var awkwardNames = [
+  {name: "!"},
+  {name: "!="},
+  {name: "<"},
+  {name: "<="},
+  {name: "=="},
+  {name: ">"},
+  {name: ">="},
+  {name: "-", skip: true},
+  {name: "*"},
+  {name: "/"},
+  {name: "%"},
+  {name: "^"},
+  {name: "+", skip: true},
+  {name: "e"}
+];
+awkwardNames.forEach(function(def) {
+  var name = def.name;
+  tests.push({
+    name: "function: awkward name: "+name,
+    input: name+"(0, 1)",
+    skip: def.skip,
+    output: [
+      name, 0, 1
+    ]
+  })
+})
+
+
 
 
 describe("simple-expr", function() {
