@@ -1,5 +1,5 @@
 var assert = require("assert");
-var maputnikExpr = require("./");
+var simpleExpr = require("../");
 
 
 const tests = [
@@ -33,6 +33,21 @@ const tests = [
     ]
   },
   {
+    name: "missing arg separator",
+    input: `
+    concat("hello" "world")
+    `,
+    throw: true,
+  },
+  {
+    name: "multiple expressions",
+    input: `
+    concat("hello" "world")
+    concat("hello" "world")
+    `,
+    throw: true,
+  },
+  {
     name: "string arg function",
     input: `
     concat("hello", " ", "world")
@@ -57,7 +72,12 @@ const tests = [
     &bar = 2
     add(&foo, &bar) 
     `,
-    throw: true
+    output: [
+      "let",
+      "foo", 1,
+      "bar", 2,
+      ["add", ["var", "foo"], ["var", "bar"]]
+    ]
   },
   {
     name: "expression nesting",
@@ -71,13 +91,13 @@ const tests = [
 ]
 
 
-describe("maputnik-expr", function() {
+describe("simple-expr", function() {
   describe("parse", function() {
     tests.forEach(function(test) {
       it(test.name, function() {
         var err, out;
         try {
-          out = maputnikExpr.compiler(test.input);
+          out = simpleExpr.compiler(test.input);
         }
         catch(_err) {
           err = _err;
@@ -100,7 +120,7 @@ describe("maputnik-expr", function() {
     tests.forEach(function(test) {
       it(test.name, function() {
         assert.deepEqual(
-          maputnikExpr.stringify(test.output, {newline: false}),
+          simpleExpr.stringify(test.output, {newline: false}),
           test.input
         )
       })

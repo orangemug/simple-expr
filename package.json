@@ -1,4 +1,9 @@
 {
+  "name": "simple-expr",
+  "version": "0.0.0",
+  "scripts": {
+    "test": "mocha test/index.js"
+  },
   "dependencies": {
     "yargs": "^10.0.3"
   },
