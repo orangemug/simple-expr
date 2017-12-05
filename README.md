@@ -218,4 +218,4 @@ $ maputnik-expr run --d rank=1 zoom=1.1 input.expr
 ## License
 [MIT](LICENSE)
 
-[mapbox-gl-expressions]: (https://www.mapbox.com/mapbox-gl-js/style-spec#expressions)
+[mapbox-gl-expressions]: https://www.mapbox.com/mapbox-gl-js/style-spec#expressions
