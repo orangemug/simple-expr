@@ -1,0 +1,129 @@
+html {
+  box-sizing: border-box;
+}
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+}
+
+a {
+  color: inherit;
+}
+
+.app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.app__header {
+  display: flex;
+  align-items: center;
+  padding: 4px 6px;
+}
+
+.app__header__title {
+  flex: 1;
+}
+
+.app__header__title h1 {
+  font-size: 28px;
+  margin: 0;
+}
+
+.app__header__subtitle {
+  font-size: 14px;
+}
+
+.toolbox {
+  padding: 0 6px;
+}
+
+.toolbox .icon {
+  margin-right: 4px;
+}
+
+.icon {
+  vertical-align: middle;
+  text-decoration: none;
+}
+
+
+.app__main {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  flex: 1 1 50%;
+  display: flex;
+}
+
+.row:nth-child(n+2) {
+  border-top: solid 1px #555;
+}
+
+.cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+}
+
+.cell:nth-child(n+2) {
+  border-left: solid 1px #555;
+}
+
+.cell__header {
+  flex: 0;
+  background: black;
+  color: white;
+  padding: 4px 6px;
+}
+
+.cell__content {
+  flex: 1;
+  position: relative;
+  overflow-x: auto;
+}
+
+.editor {
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll;
+  border: none;
+  resize: none;
+  font-family: monospace;
+  font-size: 13px;
+}
+
+.result {
+  margin: 0;
+  overflow-y: scroll;
+}
+
+.geojson {
+  margin: 0;
+  overflow-y: scroll;
+}
+
+.map {
+  background: #333;
+  height: 100%;
+}
+
+.examples {
+  float: right;
+}

@@ -3,6 +3,7 @@
     "yargs": "^10.0.3"
   },
   "devDependencies": {
+    "browserify": "^14.5.0",
     "mocha": "^4.0.1"
   }
 }
