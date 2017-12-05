@@ -12,14 +12,14 @@ const tests = [
     output: ["number", 1]
   },
   {
-    name: "number: integer (with +sign)",
+    name: "number: integer with +sign",
     input: `
       number(+1)
     `,
     output: ["number", 1]
   },
   {
-    name: "number: integer (with -sign)",
+    name: "number: integer with -sign",
     input: `
       number(-1)
     `,
@@ -33,21 +33,21 @@ const tests = [
     output: ["number", 3.14]
   },
   {
-    name: "number: float (with +sign)",
+    name: "number: float with +sign",
     input: `
       number(+3.14)
     `,
     output: ["number", 3.14]
   },
   {
-    name: "number: float (with -sign)",
+    name: "number: float with -sign",
     input: `
       number(-3.14)
     `,
     output: ["number", -3.14]
   },
   {
-    name: "number: float (invalid)",
+    name: "number: invalid float",
     input: `
       number(3.14.3)
     `,
@@ -209,6 +209,11 @@ awkwardNames.forEach(function(def) {
 describe("simple-expr", function() {
   describe("parse", function() {
     tests.forEach(function(test) {
+      var name = test.name;
+      if(test.throw) {
+        name += " (throws error)";
+      }
+
       function fn() {
         var err, out;
         try {
@@ -230,13 +235,13 @@ describe("simple-expr", function() {
       }
 
       if(test.only) {
-        it.only(test.name, fn);
+        it.only(name, fn);
       }
       else if(test.skip) {
-        it.skip(test.name, fn);
+        it.skip(name, fn);
       }
       else {
-        it(test.name, fn);
+        it(name, fn);
       }
     })
   })
