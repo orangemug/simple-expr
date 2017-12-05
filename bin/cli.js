@@ -139,7 +139,7 @@ var argv = yargs
         .describe("globals", "globals data")
     },
     function(argv) {
-      var featureOpts = parseOpts(argv.feature);
+      var featureOpts = parseOpts(argv["feature-props"]);
       var globalOpts  = parseOpts(argv.globals);
 
       optOrStdin(argv._[1])
