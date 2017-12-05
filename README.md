@@ -13,7 +13,7 @@ The primary aim of this language is to support [MapboxGL expressions][mapbox-gl-
 This is a tiny functional language that get converted into [MapboxGL expressions][mapbox-gl-expressions]. The idea behind the language is that it can be converted in a lossless way between the languages and [MapboxGL expressions][mapbox-gl-expressions].
 
 
-**Demo:**: <https://orangemug.github.io/simple-expr>
+**Demo:** <https://orangemug.github.io/simple-expr>
 
 **Note:** This is super alpha software
 
