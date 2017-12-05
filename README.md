@@ -1,14 +1,13 @@
 # simple-expr
 Simple expression language for mapbox-gl-js expressions
 
-**Note:** This is very early in development proceed with caution
-
 [![stability-experimental](https://img.shields.io/badge/stability-experimental-orange.svg)][stability]
 [![Build Status](https://circleci.com/gh/orangemug/simple-expr.png?style=shield)][circleci]
 
 [stability]:   https://github.com/orangemug/stability-badges#experimental
 [circleci]:    https://circleci.com/gh/orangemug/simple-expr
 
+**Note:** This is very early in development proceed with caution
 
 The primary aim of this language is to support [MapboxGL expressions][mapbox-gl-expressions], although it should also be generally useful.
 
