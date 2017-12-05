@@ -68,6 +68,7 @@ a {
 
 .row {
   flex: 1 1 50%;
+  max-height: 50%;
   display: flex;
 }
 
