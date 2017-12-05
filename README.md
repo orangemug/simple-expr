@@ -98,7 +98,7 @@ Any characters surrounded in quotes, for example
 "foo bar"
 ```
 
-You can excape quotes with `\\` for example
+You can escape quotes with `\` for example
 
 ```
 "They said \"it couldn't be done\""
@@ -128,7 +128,7 @@ Will become
 
 
 ### Feature references
-As well as using the `get` function ([see spec](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-get)) there is also a shothand to reference feature data. The following
+As well as using the `get` function ([see spec](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-get)) there is also a shorthand to reference feature data. The following
 
 ```
 rgb(@rating, 0, 0)
@@ -156,14 +156,14 @@ You can also define variables before the expressions. Variables are also allowed
 rgb(&r, 0, 0)
 ```
 
-Variables **must** start with a `&` both in there defintion and their usage.
+Variables **must** start with a `&` both in there definition and their usage.
 
 
 ## Usage
-You can parse, compile to json. It comes in 2 forms, the CLI (command line interface) and the javascript API
+You can parse, compile to JSON. It comes in 2 forms, the CLI (command line interface) and the JavaScript API
 
 
-## JS API
+## JavaScript API
 
 ### Compile to expression JSON
 ```js
@@ -276,3 +276,4 @@ simple-expr execute --feature-props name=Maputnik examples/concat.expr > /tmp/co
 [MIT](LICENSE)
 
 [mapbox-gl-expressions]: https://www.mapbox.com/mapbox-gl-js/style-spec#expressions
+
