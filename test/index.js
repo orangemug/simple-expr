@@ -1,4 +1,5 @@
 var assert = require("assert");
+var readmeTester = require("readme-tester");
 var simpleExpr = require("../");
 
 
@@ -194,5 +195,12 @@ describe("simple-expr", function() {
         )
       })
     })
+  })
+
+  it("README.md", function(done) {
+    readmeTester(__dirname+"/../README.md", function(err, assertions) {
+      assert.ifError(err);
+      done(err);
+    });
   })
 })
