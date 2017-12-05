@@ -1,5 +1,34 @@
 var fs = require("fs");
 var yargs = require("yargs");
+var simpleExpr = require("../");
+var mgl = require("@mapbox/mapbox-gl-style-spec");
+
+
+function handleError(err) {
+  console.log(err);
+  process.eixt(1);
+}
+
+function parseOpts(str) {
+  var out = {};
+  str = str || "";
+
+  var items = str
+    .split(/\s+/)
+    .filter(function(item) {
+      return item != "";
+    })
+
+  items.forEach(function(item) {
+    var parts = item.split("=")
+    if(parts.length !== 2) {
+      throw "Invalid format '"+item+"' expected format FOO=bar"
+    }
+    out[parts[0]] = parts[1];
+  });
+
+  return out;
+}
 
 function optOrStdin(filepath) {
   if(filepath) {
@@ -10,7 +39,7 @@ function optOrStdin(filepath) {
         }
         else {
           try {
-            resolve(JSON.parse(data.toString()));
+            resolve(data.toString());
           }
           catch(err) {
             reject(err);
@@ -27,7 +56,7 @@ function optOrStdin(filepath) {
       });
       process.stdin.on('end', function() {
         try {
-          resolve(JSON.parse(raw))
+          resolve(raw)
         } catch(err) {
           reject(err);
         }
@@ -38,25 +67,88 @@ function optOrStdin(filepath) {
 
 var argv = yargs
   .command(
-    "parse [file]",
+    "parse",
     "code -> ast",
     function (yargs) {
-      return yargs;
+      return yargs
     },
     function (argv) {
-      console.log(argv._[1])
       optOrStdin(argv._[1])
         .then(function(data) {
-          console.log("data", data)
+          var ast = simpleExpr.parser(
+            simpleExpr.tokenizer(data)
+          )
+          var json = JSON.stringify(ast, null, 2);
+          console.log(json)
+          process.exit(0)
         })
+        .catch(handleError)
     }
   )
-  .command("compile", "code -> json")
-  .command("decompile", "json -> code")
-  .command("execute", "execute as js function")
+  .command(
+    "compile",
+    "code -> json",
+    function (yargs) {
+      return yargs
+    },
+    function(argv) {
+      optOrStdin(argv._[1])
+        .then(function(data) {
+          var json = simpleExpr.compiler(data)
+          console.log(json)
+          process.exit(0)
+        })
+        .catch(handleError)
+    }
+  )
+  .command(
+    "decompile",
+    "json -> code",
+    function (yargs) {
+      return yargs
+    },
+    function(argv) {
+      throw "Todo";
+    }
+  )
+  .command(
+    "execute",
+    "execute as js function",
+    function (yargs) {
+      return yargs
+        .describe("feature-props", "feature properties")
+        .describe("feature-id", "feature id")
+        .describe("feature-type", "feature type")
+        .describe("globals", "globals data")
+    },
+    function(argv) {
+      var featureOpts = parseOpts(argv.feature);
+      var globalOpts  = parseOpts(argv.globals);
+
+      optOrStdin(argv._[1])
+        .then(function(data) {
+          var json = simpleExpr.compiler(data)
+
+          var out = mgl.expression.createExpression(json, {})
+          var result = out.value.evaluate(globalOpts, {
+            id: argv["feature-id"],
+            type: argv["feature-type"],
+            properties: featureOpts
+          })
+
+          console.log(result);
+          process.exit(0);
+        })
+        .catch(handleError)
+    }
+  )
   .example("simple-expr compile input.expr", "compile an expression")
   .example("simple-expr decompile input.json", "decompile an expression")
   .example("simple-expr compile input.expr | mgl-exec execute --data foo=1 bar=2", "Compile and run with some data")
   .argv;
 
+
+if(argv._.length < 1) {
+  yargs.showHelp();
+}
 

@@ -5,6 +5,7 @@
     "test": "mocha test/index.js"
   },
   "dependencies": {
+    "@mapbox/mapbox-gl-style-spec": "^10.1.0",
     "yargs": "^10.0.3"
   },
   "devDependencies": {
