@@ -478,7 +478,7 @@ var EXAMPLES = [
     name: "color on score",
     code: [
       "interpolate(",
-      "  linear(), @score",
+      "  linear(), @score,",
       "  0, rgb(255, 0, 0),",
       "  50, rgb(0, 255, 0),",
       "  100, rgb(0, 0, 255)",
