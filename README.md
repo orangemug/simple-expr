@@ -207,14 +207,68 @@ assert.deepEqual(ast, {
 
 
 ## CLI
-**NOTE: Not yet available**
+The available CLI commands are
 
+### Parse
 ```
-$ maputnik-expr parse input.expr
-$ maputnik-expr compile --format json input.expr
-$ maputnik-expr compile --format js input.expr
-$ maputnik-expr run input.expr data.json
-$ maputnik-expr run --d rank=1 zoom=1.1 input.expr
+simple-expr parse examples/concat.expr > /tmp/concat.ast
+## >>/tmp/concat.ast
+## {
+##   "type": "Program",
+##   "body": [
+##     {
+##       "type": "CallExpression",
+##       "name": "concat",
+##       "params": [
+##         {
+##           "type": "StringLiteral",
+##           "value": "Hello"
+##         },
+##         {
+##           "type": "StringLiteral",
+##           "value": " "
+##         },
+##         {
+##           "type": "FeatureRef",
+##           "value": "name"
+##         }
+##       ]
+##     }
+##   ]
+## }
+## <<
+```
+
+### Compile
+```
+simple-expr compile examples/concat.expr > /tmp/concat.json
+## >>/tmp/concat.json
+## [
+##   "concat",
+##   "Hello",
+##   " ",
+##   [
+##     "get",
+##     "name"
+##   ]
+## ]
+## <<
+```
+
+### Decompile
+```
+simple-expr decompile examples/concat.json > /tmp/concat.expr
+## >>/tmp/concat.expr
+## concat("Hello", " ", @name)
+## <<
+```
+
+### Execute
+```
+simple-expr execute --feature-props name=Maputnik examples/concat.expr > /tmp/concat.log
+## >>/tmp/concat.log
+## Hello Maputnik
+## <<
 ```
 
 
