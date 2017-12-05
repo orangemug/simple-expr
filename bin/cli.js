@@ -1,7 +1,7 @@
-var fs = require("fs");
-var yargs = require("yargs");
+var fs         = require("fs");
+var yargs      = require("yargs");
 var simpleExpr = require("../");
-var mgl = require("@mapbox/mapbox-gl-style-spec");
+var mgl        = require("@mapbox/mapbox-gl-style-spec");
 
 
 function handleError(err) {
@@ -95,7 +95,7 @@ var argv = yargs
       optOrStdin(argv._[1])
         .then(function(data) {
           var json = simpleExpr.compiler(data)
-          console.log(json)
+          console.log(JSON.stringify(json, null, 2))
           process.exit(0)
         })
         .catch(handleError)
@@ -108,7 +108,23 @@ var argv = yargs
       return yargs
     },
     function(argv) {
-      throw "Todo";
+      optOrStdin(argv._[1])
+        .then(function(data) {
+          var json;
+          try {
+            json = JSON.parse(data);
+          }
+          catch(err) {
+            console.error("Invalid JSON");
+            console.error(err);
+            process.exit(1);
+          }
+
+          var code = simpleExpr.decompile(json);
+          console.log(code);
+          process.exit(0);
+        })
+        .catch(handleError)
     }
   )
   .command(

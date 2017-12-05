@@ -357,11 +357,45 @@ function codeGenerator(nodes) {
 }
 
 
+/**
+ * This is a bit messy at the moment and should parse back to the AST
+ */
+function decompile(node) {
+  if(node.length < 1) {
+    throw "node requires function name";
+  }
+
+  var command = node[0];
+  var args = node.slice(0);
+
+  if(command == "get") {
+    if(node.length !== 2) {
+      throw "'get' has too many params";
+    }
+    return "@"+node[1]
+  }
+  else {
+    var argsStr = args.map(function(childNode) {
+      if(Array.isArray(childNode)) {
+        return decompile(childNode)
+      }
+      else {
+        return JSON.stringify(childNode);
+      }
+    })
+    .join(", ")
+
+    return command+"("+argsStr+")"
+  }
+}
+
+
 module.exports = {
   tokenizer,
   parser,
   transformer,
   compiler,
+  decompile,
   codeGenerator
 };
 
