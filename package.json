@@ -1,6 +1,9 @@
 {
   "name": "simple-expr",
   "version": "0.0.0",
+  "bin": {
+    "simple-expr": "./bin/cli.js"
+  },
   "scripts": {
     "test": "mocha test/index.js"
   },
