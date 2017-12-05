@@ -3,9 +3,13 @@ Simple expression language for [mapbox-gl-js expressions][mapbox-gl-expressions]
 
 [![stability-experimental](https://img.shields.io/badge/stability-experimental-orange.svg)][stability]
 [![Build Status](https://circleci.com/gh/orangemug/simple-expr.png?style=shield)][circleci]
+[![Dependency Status](https://david-dm.org/orangemug/simple-expr.svg)][dm-prod]
+[![Dev Dependency Status](https://david-dm.org/orangemug/simple-expr/dev-status.svg)][dm-dev]
 
 [stability]:   https://github.com/orangemug/stability-badges#experimental
 [circleci]:    https://circleci.com/gh/orangemug/simple-expr
+[dm-prod]:     https://david-dm.org/orangemug/simple-expr
+[dm-dev]:      https://david-dm.org/orangemug/simple-expr#info=devDependencies
 
 ‼️ This is an experimental repository, if you find it useful or interesting please leave a comment. There is a general discussion issue in [issue #1](https://github.com/orangemug/simple-expr/issues/1), leave any general thoughts there. Or [open a new issue](https://github.com/orangemug/simple-expr/issues/new) for bugs or to suggest new features.
 
