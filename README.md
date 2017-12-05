@@ -7,14 +7,39 @@ Simple expression language for mapbox-gl-js expressions
 [stability]:   https://github.com/orangemug/stability-badges#experimental
 [circleci]:    https://circleci.com/gh/orangemug/simple-expr
 
-**Note:** This is very early in development proceed with caution
+‼️ This is an experimental repository, if you find it useful or interesting please leave a comment. There is a general discussion issue in [issue #1](https://github.com/orangemug/simple-expr/issues/1). Leave any general thoughts there or [open a new issue](https://github.com/orangemug/simple-expr/issues/new) for bugs or to suggest new features.
+
+
 
 The primary aim of this language is to support [MapboxGL expressions][mapbox-gl-expressions], although it should also be generally useful.
 
 This is a tiny functional language that get converted into [MapboxGL expressions][mapbox-gl-expressions]. The idea behind the language is that it can be converted in a lossless way between the languages and [MapboxGL expressions][mapbox-gl-expressions].
 
 
-**Demo:** <https://orangemug.github.io/simple-expr>
+Basically it's just a nicer way to write MapboxGL expressions. Here's an example the following JSON
+
+```json
+[
+  "interpolate",
+  ["linear"], ["get", "score"],
+  0, ["rgb", 255, 0, 0],
+  50, ["rgb", 0, 255, 0],
+  100, ["rgb", 0, 0, 255]
+]
+```
+
+Would be written as
+
+```
+interpolate(
+  linear(), @score,
+  0, rgb(255, 0, 0),
+  50, rgb(0, 255, 0),
+  100, rgb(0, 0, 255)
+)
+```
+
+**See it in action:** <https://orangemug.github.io/simple-expr>
 
 
 ## Install
