@@ -1,20 +1,25 @@
 var simpleExpr = require("../");
 
+function makePoint(lon, lat, props) {
+  return {
+    "type": "Feature",
+    "geometry": {
+      "type": "Point",
+      "coordinates": [lon, lat]
+    },
+    "properties": props
+  }
+}
+
 var state = {
   geojson: {
     "type": "FeatureCollection",
     "features": [
-      {
-        "type": "Feature",
-        "geometry": {
-          "type": "Point",
-          "coordinates": [8.5417,47.3769]
-        },
-        "properties": {
-          "score": 100,
-          "type": "bar"
-        }
-      }
+      makePoint(8.5217, 47.3769, {score: 20}),
+      makePoint(8.5317, 47.3569, {score: 40}),
+      makePoint(8.5417, 47.3969, {score: 60}),
+      makePoint(8.5517, 47.3869, {score: 80}),
+      makePoint(8.5117, 47.3769, {score: 100})
     ]
   },
   code: "rgb(@score, 100, 100)",
@@ -31,6 +36,17 @@ var examplesEl = document.querySelector(".examples");
 
 var EXAMPLES = [
   {
+    name: "color on score",
+    code: [
+      "interpolate(",
+      "  linear(), @score",
+      "  0, rgb(255, 0, 0),",
+      "  50, rgb(0, 255, 0),",
+      "  100, rgb(0, 0, 255)",
+      ")"
+    ].join("\n")
+  },
+  {
     name: "interpolate on zoom",
     code: [
       "interpolate(",
@@ -41,17 +57,6 @@ var EXAMPLES = [
       ")"
     ].join("\n")
   },
-  {
-    name: "color on score",
-    code: [
-      "interpolate(",
-      "  linear(), @score",
-      "  0, rgb(255, 0, 0),",
-      "  50, rgb(0, 255, 0),",
-      "  100, rgb(0, 0, 255)",
-      ")"
-    ].join("\n")
-  }
 ];
 
 examplesEl.innerHTML = EXAMPLES.map(function(example) {
