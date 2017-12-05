@@ -115,6 +115,7 @@ rgb(get("rating"), 0, 0)
 
 ### Variables
 **NOTE: Not yet available**
+
 You can also define variables before the expressions. Variables are also allowed to define a single expression. A quick example
 
 ```
