@@ -11,6 +11,7 @@ html {
   font-family: monospace;
   font-size: 13px;
   border: solid 1px #ccc;
+  resize: vertical;
 }
 
 .output {
