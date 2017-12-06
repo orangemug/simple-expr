@@ -360,13 +360,21 @@ function codeGenerator(nodes) {
 /**
  * This is a bit messy at the moment and should parse back to the AST
  */
-function decompile(node) {
+function decompile(node, depth) {
+  depth = depth || 0;
+
   if(node.length < 1) {
-    throw "node requires function name";
+    if(depth > 0) {
+      throw "node requires function name";
+    }
+    else {
+      // Empty expression
+      return "";
+    }
   }
 
   var command = node[0];
-  var args = node.slice(0);
+  var args = node.slice(1);
 
   if(command == "get") {
     if(node.length !== 2) {
@@ -379,8 +387,11 @@ function decompile(node) {
       if(Array.isArray(childNode)) {
         return decompile(childNode)
       }
+      else if(typeof(childNode) === "number") {
+        return childNode
+      }
       else {
-        return JSON.stringify(childNode);
+        return "\""+childNode+"\"";
       }
     })
     .join(", ")
