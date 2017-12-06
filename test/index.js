@@ -280,19 +280,31 @@ describe("simple-expr", function() {
     })
   })
 
-  describe("stringify", null, function() {
-    tests.forEach(function(test) {
-      it(test.name, function() {
-        assert.deepEqual(
-          simpleExpr.stringify(test.output, {newline: false}),
-          test.input
-        )
+  describe("execute", function() {
+    it("simple", function() {
+      var json = simpleExpr.compiler(`concat("Hello", " ", @name)`)
+      var out = simpleExpr.execute(json, {
+        feature: {
+          properties: {
+            name: "Maputnik"
+          }
+        }
       })
+
+      assert.equal(out, "Hello Maputnik");
     })
+  })
+
+  describe("cli", function() {
+    it("parse")
+    it("compile")
+    it("decompile")
+    it("execute")
   })
 
   it("README.md", function(done) {
     this.timeout(10*1000);
+
     readmeTester(__dirname+"/../README.md", {bash: true}, function(err, assertions) {
       assert.ifError(err);
       done(err);

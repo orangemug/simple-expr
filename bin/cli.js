@@ -2,7 +2,6 @@
 var fs         = require("fs");
 var yargs      = require("yargs");
 var simpleExpr = require("../");
-var mgl        = require("@mapbox/mapbox-gl-style-spec");
 
 
 function handleError(err) {
@@ -145,12 +144,12 @@ var argv = yargs
       optOrStdin(argv._[1])
         .then(function(data) {
           var json = simpleExpr.compiler(data)
-
-          var out = mgl.expression.createExpression(json, {})
-          var result = out.value.evaluate(globalOpts, {
-            id: argv["feature-id"],
-            type: argv["feature-type"],
-            properties: featureOpts
+          var result = simpleExpr.execute(json, {
+            feature: {
+              id: argv["feature-id"],
+              type: argv["feature-type"],
+              properties: featureOpts
+            }
           })
 
           console.log(result);

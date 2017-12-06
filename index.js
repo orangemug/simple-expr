@@ -1,3 +1,18 @@
+var mgl;
+
+try {
+  mgl = require("@mapbox/mapbox-gl-style-spec");
+}
+catch(err) {
+  if(err.code === 'MODULE_NOT_FOUND') {
+    // Ignore this is optional
+  }
+  else {
+    throw err;
+  }
+}
+
+
 /**
  * This parser was built from <https://github.com/thejameskyle/the-super-tiny-compiler>
  */
@@ -400,6 +415,14 @@ function decompile(node, depth) {
   }
 }
 
+function execute(json, opts) {
+  if(!mgl) {
+    throw "'@mapbox/mapbox-gl-style-spec' not found, install as peer dependency if you want to use this method";
+  }
+  var out = mgl.expression.createExpression(json, {})
+  return out.value.evaluate(opts.global, opts.feature)
+}
+
 
 module.exports = {
   tokenizer,
@@ -407,6 +430,7 @@ module.exports = {
   transformer,
   compiler,
   decompile,
-  codeGenerator
+  codeGenerator,
+  execute
 };
 
