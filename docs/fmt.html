@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>fmt</title>
+    <link rel="stylesheet" type="text/css" href="fmt.css">
+  </head>
+  <body>
+
+    <header>
+      <h1>fmt</h1>
+      <p>
+        An attempt at an auto formatter for simple-expr.
+      </p>
+      <p>
+        The steps are
+      </p>
+      <ol>
+        <li>Compile the code</li>
+        <li>Decompile the code again, whitespace will differ</li>
+        <li>Replace cursor to correct position with sourcemap (TODO)</li>
+      </ol>
+    </header>
+    <label>Input</label>
+    <textarea class="input">rgb(
+  @score,
+  /(@score, 3),
+  0
+)</textarea>
+
+    <label>Output</label>
+    <div class="debug"></div>
+    <pre class="output"></pre>
+
+    <!-- scripts -->
+    <script type="text/javascript" src="fmt.js"></script>
+  </body>
+</html>
+
