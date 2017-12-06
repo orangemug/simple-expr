@@ -258,7 +258,8 @@ describe("simple-expr", function() {
   })
 
   it("README.md", function(done) {
-    readmeTester(__dirname+"/../README.md", function(err, assertions) {
+    this.timeout(10*1000);
+    readmeTester(__dirname+"/../README.md", {bash: true}, function(err, assertions) {
       assert.ifError(err);
       done(err);
     });

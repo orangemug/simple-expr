@@ -14,6 +14,6 @@
   "devDependencies": {
     "browserify": "^14.5.0",
     "mocha": "^4.0.1",
-    "readme-tester": "github:orangemug/readme-tester#v0.6.0"
+    "readme-tester": "github:orangemug/readme-tester#v0.7.0"
   }
 }
