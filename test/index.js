@@ -16,6 +16,9 @@ const tests = [
     input: `
       number(+1)
     `,
+    decompiled: `
+      number(1)
+    `,
     output: ["number", 1]
   },
   {
@@ -36,6 +39,9 @@ const tests = [
     name: "number: float with +sign",
     input: `
       number(+3.14)
+    `,
+    decompiled: `
+      number(3.14)
     `,
     output: ["number", 3.14]
   },
@@ -204,45 +210,73 @@ awkwardNames.forEach(function(def) {
 })
 
 
+function buildTest(test, runner) {
+  var name = test.name;
+  if(test.throw) {
+    name += " (throws error)";
+  }
+
+  function fn() {
+    var err, out;
+    try {
+      out = runner.fn();
+    }
+    catch(_err) {
+      err = _err;
+    }
+
+    if(test.throw) {
+      assert(err);
+    }
+    else if(err) {
+      throw err;
+    }
+    else {
+      runner.assertion(out);
+    }
+  }
+
+  if(test.only) {
+    it.only(name, fn);
+  }
+  else if(test.skip) {
+    it.skip(name, fn);
+  }
+  else {
+    it(name, fn);
+  }
+}
 
 
 describe("simple-expr", function() {
-  describe("parse", function() {
+  describe("compile", function() {
     tests.forEach(function(test) {
-      var name = test.name;
-      if(test.throw) {
-        name += " (throws error)";
-      }
+      buildTest(test, {
+        fn: function() {
+          return simpleExpr.compiler(test.input);
+        },
+        assertion: function(actual) {
+          assert.deepEqual(actual, test.output)
+        }
+      })
+    })
+  })
 
-      function fn() {
-        var err, out;
-        try {
-          out = simpleExpr.compiler(test.input);
-        }
-        catch(_err) {
-          err = _err;
-        }
+  describe("decompile", function() {
+    tests.forEach(function(test) {
+      buildTest(test, {
+        fn: function() {
+          return simpleExpr.decompile(simpleExpr.compiler(test.input));
+        },
+        assertion: function(actual) {
+          var expected = test.decompiled || test.input;
+          expected = expected
+            .replace(/^\s+/, "")
+            .replace(/\s+$/, "")
 
-        if(test.throw) {
-          assert(err);
+          assert.deepEqual(actual, expected)
         }
-        else if(err) {
-          throw err;
-        }
-        else {
-          assert.deepEqual(out, test.output)
-        }
-      }
-
-      if(test.only) {
-        it.only(name, fn);
-      }
-      else if(test.skip) {
-        it.skip(name, fn);
-      }
-      else {
-        it(name, fn);
-      }
+      })
     })
   })
 
