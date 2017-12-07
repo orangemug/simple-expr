@@ -7,6 +7,16 @@ const tests = [
   {
     name: "number: integer",
     input: `
+      number(
+        1
+      )
+    `,
+    decompiled: "number(1)",
+    output: ["number", 1]
+  },
+  {
+    name: "number: integer",
+    input: `
       number(1)
     `,
     output: ["number", 1]
@@ -289,6 +299,13 @@ describe("simple-expr", function() {
         )
       })
     })
+  })
+
+  describe("cli", function() {
+    it("parse")
+    it("compile")
+    it("decompile")
+    it("execute")
   })
 
   it("README.md", function(done) {

@@ -1,3 +1,6 @@
+var sourceMap = require("source-map");
+
+
 /**
  * This parser was built from <https://github.com/thejameskyle/the-super-tiny-compiler>
  */
@@ -7,11 +10,28 @@ function tokenizer(input) {
 
   let tokens = [];
 
+  let row = 0;
+  let offset = 0;
+
+  function addToken(obj) {
+    var token = Object.assign({}, obj, {
+      row: row,
+      col: (current) - offset
+    })
+    tokens.push(token)
+    return token;
+  }
+
   while (current < input.length) {
     let char = input[current];
 
+    if(char === "\n") {
+      row += 1;
+      offset = current + 1/*Including the '\n' */;
+    }
+
     if (char === '(') {
-      tokens.push({
+      addToken({
         type: 'paren',
         value: '(',
       });
@@ -19,7 +39,7 @@ function tokenizer(input) {
       continue;
     }
     if (char === ')') {
-      tokens.push({
+      addToken({
         type: 'paren',
         value: ')',
       });
@@ -27,7 +47,7 @@ function tokenizer(input) {
       continue;
     }
     if(char === ",") {
-      tokens.push({
+      addToken({
         type: 'arg_sep'
       });
       current++;
@@ -46,22 +66,27 @@ function tokenizer(input) {
     if (NUMBERS.test(char)) {
       let value = '';
 
+      var token = addToken({type: 'number'});
+
       while (NUMBERS.test(char)) {
         value += char;
         char = input[++current];
       }
 
+      token.value = value;
+
       if(!value.match(/^[+-]?([0-9]*\.)?[0-9]+$/)) {
         throw "Invalid number '"+value+"'"
       }
 
-      tokens.push({ type: 'number', value });
       continue;
     }
 
     // Variable
 		if (char === '&') {
       let value = '';
+
+      var token = addToken({ type: 'var_ref'});
 
       // Skip the '&'
       char = input[++current];
@@ -71,7 +96,7 @@ function tokenizer(input) {
         char = input[++current];
       }
 
-      tokens.push({ type: 'var_ref', value });
+      token.value = value;
 
       continue;
 		}
@@ -79,6 +104,8 @@ function tokenizer(input) {
     // Feature reference
 		if (char === '@') {
       let value = '';
+
+      var token = addToken({ type: 'feature_ref'});
 
       // Skip the '@'
       char = input[++current];
@@ -88,13 +115,16 @@ function tokenizer(input) {
         char = input[++current];
       }
 
-      tokens.push({ type: 'feature_ref', value });
+      token.value = value;
+
       continue;
 		}
 
 		if (char === '"') {
       // Keep a `value` variable for building up our string token.
       let value = '';
+
+      var token = addToken({ type: 'string'});
 
       // We'll skip the opening double quote in our token.
       char = input[++current];
@@ -110,14 +140,14 @@ function tokenizer(input) {
         }
       }
 
+      token.value = value;
+
       if(char !== "\"") {
         throw "Missing closing quote"
       }
 
       // Skip the closing double quote.
       char = input[++current];
-
-      tokens.push({ type: 'string', value });
 
       continue;
 		}
@@ -127,14 +157,15 @@ function tokenizer(input) {
     if (LETTERS.test(char)) {
       let value = '';
 
+      var token = addToken({ type: 'name'});
+
 			// This allows for log10 method name but not 10log
       while (char && LETTERS.test(char)) {
         value += char;
         char = input[++current];
       }
 
-      // And pushing that value as a token with the type `name` and continuing.
-      tokens.push({ type: 'name', value });
+      token.value = value;
 
       continue;
 		}
@@ -150,6 +181,19 @@ function parser(tokens, depth) {
 
   // Cursor
   let current = 0;
+
+  function buildNode(obj, token) {
+    var extra = {};
+    if(token) {
+      return Object.assign({}, obj, {
+        col: token.col,
+        row: token.row,
+      });
+    }
+    else {
+      return obj;
+    }
+  }
 
   function walk() {
 
@@ -185,37 +229,37 @@ function parser(tokens, depth) {
         value = parseInt(value, 10);
       }
 
-      return {
+      return buildNode({
         type: 'NumberLiteral',
         value: value
-      };
+      }, token);
     }
 
     if (token.type === 'string') {
       current++;
 
-      return {
+      return buildNode({
         type: 'StringLiteral',
         value: token.value,
-      };
+      }, token);
     }
 
     if (token.type === 'feature_ref') {
       current++;
 
-      return {
+      return buildNode({
         type: 'FeatureRef',
         value: token.value,
-      };
+      }, token);
     }
 
     if (token.type === 'var_ref') {
       current++;
 
-      return {
+      return buildNode({
         type: 'VarRef',
         value: token.value,
-      };
+      }, token);
     }
 
     if(
@@ -223,11 +267,11 @@ function parser(tokens, depth) {
     ) {
       token = tokens[current++];
 
-      let node = {
+      let node = buildNode({
         type: 'CallExpression',
         name: token.value,
         params: [],
-      };
+      }, token);
 
       if(
         tokens[current].type === 'paren' &&
@@ -252,7 +296,6 @@ function parser(tokens, depth) {
         token = tokens[current];
       }
 
-
       // Check there are some closing parenthesis
       if(!token || token.type !== "paren" || token.value !== ")") {
         throw "Missing paren"
@@ -267,10 +310,10 @@ function parser(tokens, depth) {
     throw new TypeError(token.type);
   }
 
-  let ast = {
+  let ast = buildNode({
     type: 'Program',
     body: [],
-  };
+  });
 
   while (current < tokens.length) {
     ast.body.push(walk());
@@ -313,9 +356,15 @@ function transformer(nodes) {
   }
 }
 
+function log(label, obj) {
+  console.log(label, JSON.stringify(obj, null, 2));
+}
+
 function compiler(input) {
   let tokens = tokenizer(input);
+  log("tokens", tokens);
   let ast    = parser(tokens);
+  log("ast", ast);
   let output = transformer(ast);
 
   return output;
@@ -400,6 +449,91 @@ function decompile(node, depth) {
   }
 }
 
+function decompileFromAst(node) {
+  var map = new sourceMap.SourceMapGenerator({});
+
+  function genMapping(name, opts) {
+    map.addMapping({
+      generated: {
+        line: opts.generated.line,
+        column: opts.generated.column
+      },
+      source: "foo.js",
+      original: {
+        line: opts.original.line,
+        column: opts.original.column
+      },
+      name: "foo"
+    });
+  }
+
+  var outStr = "";
+
+  function go(node, depth) {
+    depth = depth || 0;
+
+    if(node.type === "CallExpression") {
+      genMapping(node.type, {
+        original: {
+          line: node.row+1,
+          column: node.col
+        },
+        generated: {line: 1, column: outStr.length}
+      })
+      outStr = outStr + `${node.name}(`;
+      node.params.forEach(function(_node, idx) {
+        go(_node, depth)
+        if(idx < node.params.length -1) {
+          outStr += ", "
+        }
+      })
+
+      outStr = outStr + `)`;
+    }
+    else if(node.type === "NumberLiteral") {
+      genMapping(node.type, {
+        original: {
+          line: node.row+1,
+          column: node.col
+        },
+        generated: {line: 1, column: outStr.length}
+      })
+      outStr = outStr + node.value;
+    }
+    else if(node.type === "StringLiteral") {
+      genMapping(node.type, {
+        original: {
+          line: node.row+1,
+          column: node.col
+        },
+        generated: {line: 1, column: outStr.length}
+      })
+      outStr = outStr + JSON.stringify(node.value);
+    }
+    else if(node.type === "FeatureRef") {
+      genMapping(node.type, {
+        original: {
+          line: node.row+1,
+          column: node.col
+        },
+        generated: {line: 1, column: outStr.length}
+      })
+      outStr = outStr + "@"+node.value;
+    }
+
+  }
+
+  genMapping(node.type, {
+    original: {line: 1, column: 0},
+    generated: {line: 1, column: 0}
+  })
+
+  go(node.body[0])
+  return {
+    code: outStr,
+    map: map.toJSON()
+  };
+}
 
 module.exports = {
   tokenizer,
@@ -407,6 +541,8 @@ module.exports = {
   transformer,
   compiler,
   decompile,
+  codeGenerator,
+  decompileFromAst,
   codeGenerator
 };
 

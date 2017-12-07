@@ -1,8 +1,15 @@
 var simpleExpr = require("../");
+var textblock = require("../lib/textblock");
+var delegate = require('dom-delegate');
+
 
 var inputEl  = document.querySelector(".input");
 var debugEl  = document.querySelector(".debug");
 var outputEl = document.querySelector(".output");
+var mappingsSourceEl = document.querySelector(".mappings-source");
+var mappingsGeneratedEl = document.querySelector(".mappings-generated");
+
+var sourceMap = require("../lib/source-map");
 
 function update() {
   var input = inputEl.value;
@@ -12,76 +19,125 @@ function update() {
     end:   inputEl.selectionEnd
   };
 
-  function findPos(input, positions) {
-    var total = 0;
-    var out = [];
-
-    input.split("\n")
-      .forEach(function(line, colIdx) {
-        var prevTotal = total;
-        total += line.length + 1/*The removed '\n' char */;
-
-        positions.forEach(function(_pos, idx) {
-          if(!out.hasOwnProperty(idx) && _pos < total) {
-            out[idx] = {
-              row: _pos - prevTotal,
-              col: colIdx
-            }
-          }
-        })
-      })
-
-    return out;
-  }
-
-  function findPosFromCol(input, positions) {
-    var total = 0;
-    var out = [];
-
-    input.split("\n")
-      .forEach(function(line, colIdx) {
-        positions.forEach(function(_pos, idx) {
-          if(colIdx == _pos.col) {
-            out[idx] = total + _pos.row;
-          }
-        })
-
-        total += line.length + 1/*The removed '\n' char */;
-      })
-
-    return out;
-  }
-
-  var colrow = findPos(input, [pos.start, pos.end]);
-  console.log("colrow", colrow);
+  var orignalPos = textblock.indexToColRow(input, [pos.start, pos.end]);
 
   try {
-    var json = simpleExpr.compiler(input);
-    var code = simpleExpr.decompile(json);
+    var tokens = simpleExpr.tokenizer(input);
+    var ast = simpleExpr.parser(tokens);
+    var codeBits = simpleExpr.decompileFromAst(ast);
+    var code = codeBits.code;
+    var map = codeBits.map;
 
-    var colRowNew = findPosFromCol(code, colrow);
-    console.log("colRowNew", colRowNew);
 
-    if(colRowNew.length > 0) {
-      if(colRowNew.length < 2) {
-        colRowNew[1] = code.length;
+    // Get the original position of the node
+    var startGeneratedPos = sourceMap.genOrigPosition(map, {
+      line:   orignalPos[0].row+1,
+      column: orignalPos[0].col,
+    }, "foo.js");
+
+    var endGeneratedPos = sourceMap.genOrigPosition(map, {
+      line:   orignalPos[1].row+1,
+      column: orignalPos[1].col,
+    }, "foo.js");
+
+    var newPos = textblock.colRowToIndex(code, [
+      {row: startGeneratedPos.line-1, col: startGeneratedPos.column},
+      {row: endGeneratedPos.line-1, col: endGeneratedPos.column},
+    ])
+
+    if(newPos.length > 0) {
+      if(newPos.length < 2) {
+        newPos[1] = code.length;
       }
 
-      code = code.substring(0, colRowNew[0])
-        + "<span class='debug-selected'>"+code.substring(colRowNew[0], colRowNew[1])+"</span>"
-        + code.substring(colRowNew[1])
+      var hlCode = code.substring(0, newPos[0])
+        + "<span class='debug-selected'>"+code.substring(newPos[0], newPos[1])+"</span>"
+        + code.substring(newPos[1])
     }
 
-    outputEl.innerHTML = code;
+
+    var mappings = sourceMap.getMappings(map)
+
+    function insertIntoString(orig, idx, text) {
+      return orig.substring(0, idx) + text + orig.substring(idx);
+    }
+
+    var offset = 0;
+    var mappedCode = code + "";
+    mappings.forEach(function(mapping, idx) {
+      var opts = {row: mapping.generatedLine-1, col: mapping.generatedColumn}
+      var pos = textblock.colRowToIndex(code, [opts])[0];
+
+      pos += offset;
+      var toInsert = "<span data-type=\"original\" data-idx=\""+idx+"\" class=\"mapping\"></span>";
+      offset += toInsert.length;
+      mappedCode = insertIntoString(mappedCode, pos, toInsert)
+    })
+
+    mappingsGeneratedEl.innerHTML = mappedCode;
+
+    var offset = 0;
+    var origCode = input + "";
+    mappings.forEach(function(mapping, idx) {
+      var opts = {row: mapping.originalLine-1, col: mapping.originalColumn}
+      var pos = textblock.colRowToIndex(input, [opts])[0];
+
+      pos += offset;
+      var toInsert = "<span data-type=\"generated\" data-idx=\""+idx+"\" class=\"mapping\"></span>";
+      offset += toInsert.length;
+      origCode = insertIntoString(origCode, pos, toInsert)
+    })
+
+    mappingsSourceEl.innerHTML = origCode;
+
+    outputEl.innerHTML = hlCode;
   }
   catch(err) {
+    console.error(err);
     outputEl.innerHTML = "ERR: "+err;
   }
 
-  debugEl.innerHTML = "cursor: "+JSON.stringify(colrow);
+  debugEl.innerHTML = "cursor: "+JSON.stringify(newPos);
 
 }
 
+inputEl.addEventListener("keydown", function(e) {
+  // // Allow tabs
+  // if(e.keyCode === 9) {
+		// var start = this.selectionStart;
+		// var end = this.selectionEnd;
+
+		// var value = inputEl.value;
+
+		// inputEl.value = value.substring(0, start)
+			// + "  "
+			// + value.substring(end);
+
+		// // put caret at right position again (add one for the tab)
+		// inputEl.selectionStart = inputEl.selectionEnd = start + 2;
+
+		// // prevent the focus lose
+		// e.preventDefault();
+  // }
+});
+
 inputEl.addEventListener("keyup", update);
-inputEl.addEventListener("mouseup", update);
+inputEl.addEventListener("keydown", update);
+inputEl.addEventListener("click", update);
+
+var del = delegate(document.body);
+del.on("mouseover", ".mapping", function(e, target) {
+  var type = target.getAttribute("data-type");
+  var idx  = target.getAttribute("data-idx");
+  console.log("hello", target, type, idx)
+})
+
+var downHdl;
+inputEl.addEventListener("mousedown", function() {
+  downHdl = setInterval(update, 1000/60);
+});
+
+document.addEventListener("mouseup", function() {
+  clearInterval(downHdl);
+});
 update();
