@@ -7,16 +7,6 @@ const tests = [
   {
     name: "number: integer",
     input: `
-      number(
-        1
-      )
-    `,
-    decompiled: "number(1)",
-    output: ["number", 1]
-  },
-  {
-    name: "number: integer",
-    input: `
       number(1)
     `,
     output: ["number", 1]
@@ -213,6 +203,7 @@ awkwardNames.forEach(function(def) {
     name: "function: awkward name: "+name,
     input: name+"(0, 1)",
     skip: def.skip,
+    only: def.only,
     output: [
       name, 0, 1
     ]
@@ -263,7 +254,7 @@ describe("simple-expr", function() {
     tests.forEach(function(test) {
       buildTest(test, {
         fn: function() {
-          return simpleExpr.compiler(test.input);
+          return simpleExpr.compile(test.input);
         },
         assertion: function(actual) {
           assert.deepEqual(actual, test.output)
@@ -276,7 +267,7 @@ describe("simple-expr", function() {
     tests.forEach(function(test) {
       buildTest(test, {
         fn: function() {
-          return simpleExpr.decompile(simpleExpr.compiler(test.input));
+          return simpleExpr.decompile(simpleExpr.compile(test.input));
         },
         assertion: function(actual) {
           var expected = test.decompiled || test.input;

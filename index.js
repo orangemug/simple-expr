@@ -1,49 +1,6 @@
 var sourceMap = require("source-map");
 
 
-/**
- * This is a bit messy at the moment and should parse back to the AST
- */
-function decompile(node, depth) {
-  depth = depth || 0;
-
-  if(node.length < 1) {
-    if(depth > 0) {
-      throw "node requires function name";
-    }
-    else {
-      // Empty expression
-      return "";
-    }
-  }
-
-  var command = node[0];
-  var args = node.slice(1);
-
-  if(command == "get") {
-    if(node.length !== 2) {
-      throw "'get' has too many params";
-    }
-    return "@"+node[1]
-  }
-  else {
-    var argsStr = args.map(function(childNode) {
-      if(Array.isArray(childNode)) {
-        return decompile(childNode)
-      }
-      else if(typeof(childNode) === "number") {
-        return childNode
-      }
-      else {
-        return "\""+childNode+"\"";
-      }
-    })
-    .join(", ")
-
-    return command+"("+argsStr+")"
-  }
-}
-
 function decompileFromAst(node) {
   var map = new sourceMap.SourceMapGenerator({});
 
@@ -131,11 +88,17 @@ function decompileFromAst(node) {
 }
 
 module.exports = {
-  tokenizer: require("./lib/tokenize"),
-  parser: require("./lib/parse"),
-  transformer: require("./lib/transform"),
-  compiler: require("./lib/compile"),
-  decompile,
+  compile: require("./lib/compile"),
+  decompile: require("./lib/decompile"),
+  // Compile steps
+  tokenize: require("./lib/tokenize"),
+  parse: require("./lib/parse"),
+  transform: require("./lib/transform"),
+  // Decompile steps
+  untransform: require("./lib/untransform"),
+  unparse: require("./lib/unparse"),
+  untokenize: require("./lib/untokenize"),
+  // Deprecated APIs
   decompileFromAst,
 };
 
