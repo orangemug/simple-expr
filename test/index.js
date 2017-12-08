@@ -179,6 +179,15 @@ const tests = [
       "to-color", 1
     ]
   },
+  {
+    name: "function: missing open paren after command",
+    input: `
+      interpolate(
+        0, rgb 255, 0, 0),
+      )
+    `,
+    throw: true
+  },
 ]
 
 var awkwardNames = [
