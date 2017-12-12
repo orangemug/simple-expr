@@ -76,7 +76,7 @@ const tests = [
   {
     name: "string: missing quote",
     input: `
-    concat("Hello", "world)
+    concat("Hello","world)
     `,
     throw: true
   },
@@ -90,9 +90,23 @@ const tests = [
     ]
   },
   {
+    name: "function: args with spaces",
+    input: `
+      foo(
+        1,
+        bar(  1 ,  2 ),
+        @score
+      )
+    `,
+    decompiled: `foo(1,bar(1,2),@score)`,
+    output: [
+      "foo", 1, ["bar", 1, 2], ["get", "score"]
+    ]
+  },
+  {
     name: "function: multiple args",
     input: `
-      foo(1, "2", 3, "four")
+      foo(1,"2",3,"four")
     `,
     output: [
       "foo", 1, "2", 3, "four"
@@ -101,7 +115,7 @@ const tests = [
   {
     name: "function: nested function",
     input: `
-      foo(1, "2", bar(3, baz("four")))
+      foo(1,"2",bar(3,baz("four")))
     `,
     output: [
       "foo", 1, "2", ["bar", 3, ["baz", "four"]]
@@ -132,7 +146,7 @@ const tests = [
   {
     name: "function: context references",
     input: `
-    rgb(@score, @rank, 0) 
+    rgb(@score,@rank,0) 
     `,
     output: [
       "rgb", ["get", "score"], ["get", "rank"], 0
@@ -141,7 +155,7 @@ const tests = [
   {
     name: "function: context references (alt)",
     input: `
-    rgb(0, @score, @rank) 
+    rgb(0,@score,@rank) 
     `,
     output: [
       "rgb", 0, ["get", "score"], ["get", "rank"]
@@ -180,11 +194,9 @@ const tests = [
     ]
   },
   {
-    name: "function: missing open paren after command",
+    name: "function: additional close paran",
     input: `
-      interpolate(
-        0, rgb 255, 0, 0),
-      )
+      number(1))
     `,
     throw: true
   },
@@ -210,7 +222,7 @@ awkwardNames.forEach(function(def) {
   var name = def.name;
   tests.push({
     name: "function: awkward name: "+name,
-    input: name+"(0, 1)",
+    input: name+"(0,1)",
     skip: def.skip,
     only: def.only,
     output: [

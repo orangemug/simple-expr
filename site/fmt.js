@@ -22,9 +22,10 @@ function update() {
   var orignalPos = textblock.indexToColRow(input, [pos.start, pos.end]);
 
   try {
-    var tokens = simpleExpr.tokenizer(input);
-    var ast = simpleExpr.parser(tokens);
-    var codeBits = simpleExpr.decompileFromAst(ast);
+    var tokens = simpleExpr.tokenize(input);
+    var ast = simpleExpr.parse(tokens);
+    var newTokens = simpleExpr.unparse(ast);
+    var codeBits = simpleExpr.untokenize(newTokens);
     var code = codeBits.code;
     var map = codeBits.map;
 
@@ -32,17 +33,25 @@ function update() {
     // Get the original position of the node
     var startGeneratedPos = sourceMap.genOrigPosition(map, {
       line:   orignalPos[0].row+1,
-      column: orignalPos[0].col,
+      // IS this a HACK
+      column: orignalPos[0].col-1,
     }, "foo.js");
 
     var endGeneratedPos = sourceMap.genOrigPosition(map, {
       line:   orignalPos[1].row+1,
-      column: orignalPos[1].col,
+      // IS this a HACK
+      column: orignalPos[1].col-1,
     }, "foo.js");
 
     var newPos = textblock.colRowToIndex(code, [
-      {row: startGeneratedPos.line-1, col: startGeneratedPos.column},
-      {row: endGeneratedPos.line-1, col: endGeneratedPos.column},
+      {
+        row: startGeneratedPos.line-1,
+        col: startGeneratedPos.column
+      },
+      {
+        row: endGeneratedPos.line-1,
+        col: endGeneratedPos.column
+      },
     ])
 
     if(newPos.length > 0) {
@@ -93,7 +102,7 @@ function update() {
     outputEl.innerHTML = hlCode;
   }
   catch(err) {
-    console.error(err);
+    console.error("err", err);
     outputEl.innerHTML = "ERR: "+err;
   }
 
@@ -129,7 +138,6 @@ var del = delegate(document.body);
 del.on("mouseover", ".mapping", function(e, target) {
   var type = target.getAttribute("data-type");
   var idx  = target.getAttribute("data-idx");
-  console.log("hello", target, type, idx)
 })
 
 var downHdl;
