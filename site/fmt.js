@@ -11,7 +11,8 @@ var mappingsGeneratedEl = document.querySelector(".mappings-generated");
 
 var sourceMap = require("../lib/source-map");
 
-function update() {
+
+async function update() {
   var input = inputEl.value;
 
   var pos = {
@@ -31,16 +32,16 @@ function update() {
 
 
     // Get the original position of the node
-    var startGeneratedPos = sourceMap.genOrigPosition(map, {
+    const startGeneratedPos = await sourceMap.genOrigPosition(map, {
       line:   orignalPos[0].row+1,
       // IS this a HACK
-      column: orignalPos[0].col-1,
+      column: orignalPos[0].col,
     }, "foo.js");
 
-    var endGeneratedPos = sourceMap.genOrigPosition(map, {
+    const endGeneratedPos = await sourceMap.genOrigPosition(map, {
       line:   orignalPos[1].row+1,
       // IS this a HACK
-      column: orignalPos[1].col-1,
+      column: orignalPos[1].col,
     }, "foo.js");
 
     var newPos = textblock.colRowToIndex(code, [
@@ -65,7 +66,7 @@ function update() {
     }
 
 
-    var mappings = sourceMap.getMappings(map)
+    var mappings = await sourceMap.getMappings(map)
 
     function insertIntoString(orig, idx, text) {
       return orig.substring(0, idx) + text + orig.substring(idx);

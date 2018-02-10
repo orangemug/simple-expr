@@ -13,7 +13,18 @@
     "source-map": "^0.6.1",
     "yargs": "^10.0.3"
   },
+  "browserify": {
+    "transform": [
+      "babelify"
+    ]
+  },
   "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babelify": "^8.0.0",
     "benchmark": "^2.1.4",
     "browserify": "^14.5.0",
     "dom-delegate": "^2.0.3",
