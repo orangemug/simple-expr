@@ -103,7 +103,7 @@ async function update() {
     outputEl.innerHTML = hlCode;
   }
   catch(err) {
-    console.error("err", err);
+    console.error("Error [%s, %s]:", err.line, err.column, String(err));
     outputEl.innerHTML = "ERR: "+err;
   }
 
