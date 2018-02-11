@@ -70,7 +70,7 @@ function change(e) {
   state.error = "";
 
   try {
-    state.result = simpleExpr.compiler(state.code)
+    state.result = simpleExpr.compile(state.code)
   }
   catch(err) {
     console.error(err);
