@@ -50,7 +50,7 @@ var EXAMPLES = [
     name: "interpolate on zoom",
     code: [
       "interpolate(",
-      "  linear(), zoom()",
+      "  linear(), zoom(),",
       "  0, rgb(0, 0, 0),",
       "  11, rgb(255, 0, 0),",
       "  16, rgb(0, 255, 0),",
