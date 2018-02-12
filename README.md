@@ -168,7 +168,7 @@ You can parse, compile to JSON. It comes in 2 forms, the CLI (command line inter
 ### Compile to expression JSON
 ```js
 var simpleExpr = require("simple-expr");
-var out = simpleExpr.compiler('concat("hello", " ", "world")', {format: "json"})
+var out = simpleExpr.compile('concat("hello", " ", "world")', {format: "json"})
 assert.deepEqual(out, [
   "concat", "hello", " ", "world"
 ])
@@ -178,31 +178,8 @@ assert.deepEqual(out, [
 
 ```js
 var simpleExpr = require("simple-expr");
-var tokens = simpleExpr.tokenizer('concat("hello", " ", "world")')
-var ast = simpleExpr.parser(tokens);
-assert.deepEqual(ast, {
-  "type": "Program",
-  "body": [
-    {
-      "type": "CallExpression",
-      "name": "concat",
-      "params": [
-        {
-          "type": "StringLiteral",
-          "value": "hello"
-        },
-        {
-          "type": "StringLiteral",
-          "value": " "
-        },
-        {
-          "type": "StringLiteral",
-          "value": "world"
-        }
-      ]
-    }
-  ]
-})
+var tokens = simpleExpr.tokenize('*(2,2)')
+var ast = simpleExpr.parse(tokens);
 ```
 
 
@@ -212,31 +189,6 @@ The available CLI commands are
 ### Parse
 ```bash
 simple-expr parse examples/concat.expr > /tmp/concat.ast
-## >>/tmp/concat.ast
-## {
-##   "type": "Program",
-##   "body": [
-##     {
-##       "type": "CallExpression",
-##       "name": "concat",
-##       "params": [
-##         {
-##           "type": "StringLiteral",
-##           "value": "Hello"
-##         },
-##         {
-##           "type": "StringLiteral",
-##           "value": " "
-##         },
-##         {
-##           "type": "FeatureRef",
-##           "value": "name"
-##         }
-##       ]
-##     }
-##   ]
-## }
-## <<
 ```
 
 ### Compile
@@ -259,7 +211,7 @@ simple-expr compile examples/concat.expr > /tmp/concat.json
 ```bash
 simple-expr decompile examples/concat.json > /tmp/concat.expr
 ## >>/tmp/concat.expr
-## concat("Hello", " ", @name)
+## concat("Hello"," ",@name)
 ## <<
 ```
 

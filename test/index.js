@@ -320,7 +320,7 @@ describe("simple-expr", function() {
     it("execute")
   })
 
-  it.skip("README.md", function(done) {
+  it("README.md", function(done) {
     this.timeout(10*1000);
     readmeTester(__dirname+"/../README.md", {bash: true}, function(err, assertions) {
       assert.ifError(err);
