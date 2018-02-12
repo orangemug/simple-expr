@@ -76,8 +76,8 @@ var argv = yargs
     function (argv) {
       optOrStdin(argv._[1])
         .then(function(data) {
-          var ast = simpleExpr.parser(
-            simpleExpr.tokenizer(data)
+          var ast = simpleExpr.parse(
+            simpleExpr.tokenize(data)
           )
           var json = JSON.stringify(ast, null, 2);
           console.log(json)
@@ -95,7 +95,7 @@ var argv = yargs
     function(argv) {
       optOrStdin(argv._[1])
         .then(function(data) {
-          var json = simpleExpr.compiler(data)
+          var json = simpleExpr.compile(data)
           console.log(JSON.stringify(json, null, 2))
           process.exit(0)
         })
@@ -144,7 +144,7 @@ var argv = yargs
 
       optOrStdin(argv._[1])
         .then(function(data) {
-          var json = simpleExpr.compiler(data)
+          var json = simpleExpr.compile(data)
 
           var out = mgl.expression.createExpression(json, {})
           var result = out.value.evaluate(globalOpts, {
