@@ -19,19 +19,33 @@
       <ol>
         <li>Compile the code</li>
         <li>Decompile the code again, whitespace will differ</li>
-        <li>Replace cursor to correct position with sourcemap (TODO)</li>
+        <li>Replace cursor to correct position on selection with sourcemap</li>
       </ol>
     </header>
-    <label>Input</label>
-    <textarea class="input">rgb(
-  @score,
-  /(@score, 3),
-  0
+
+    <h2>Formatter</h2>
+    <p>
+      Reformat the code, moving the cursor will translate to the generated (reformated) code.
+    </p>
+    <h3>Original (editable)</h3>
+    <textarea class="input">foo(
+  1, @rank, "hello", bar(
+    "bar", 3
+  )
 )</textarea>
 
-    <label>Output</label>
-    <div class="debug"></div>
+    <h3>Reformatted</h3>
     <pre class="output"></pre>
+    <div class="debug"></div>
+
+    <h2>Source maps</h2>
+    <p>
+      The red lines show the soure map markers.
+    </p>
+    <h3>Source</h3>
+    <pre class="mappings-source"></pre>
+    <h3>Generated</h3>
+    <pre class="mappings-generated"></pre>
 
     <!-- scripts -->
     <script type="text/javascript" src="fmt.js"></script>
