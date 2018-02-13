@@ -12,6 +12,45 @@ var mappingsGeneratedEl = document.querySelector(".mappings-generated");
 var sourceMap = require("../lib/source-map");
 
 
+function walk(node, parent, callback, opts={}) {
+  if(node.type === "CallExpression") {
+    const params = node.params;
+    node = callback(node, parent);
+
+    node.params = params.map(function(_node, idx) {
+      return walk(_node, node, callback, {
+        ...opts,
+      })
+    })
+
+    return node;
+  }
+  else if(node.type === "FeatureRef") {
+    return callback(node, parent);
+  }
+  else if(node.type === "StringLiteral") {
+    return callback(node, parent);
+  }
+  else if(node.type === "NumberLiteral") {
+    return callback(node, parent);
+  }
+  else {
+    throw TypeError(node.type);
+  }
+}
+
+function formatAst(ast) {
+  if(ast.body[0]) {
+    ast.body[0] = walk(ast.body[0], null, function(node, parent) {
+      return node;
+    })
+  }
+  else {
+    return [];
+  }
+  return ast;
+}
+
 async function update() {
   var input = inputEl.value;
 
@@ -25,7 +64,10 @@ async function update() {
   try {
     var tokens = simpleExpr.tokenize(input);
     var ast = simpleExpr.parse(tokens);
-    var newTokens = simpleExpr.unparse(ast);
+
+    const formattedAst = formatAst(ast);
+
+    var newTokens = simpleExpr.unparse(formattedAst);
     var codeBits = simpleExpr.untokenize(newTokens);
     var code = codeBits.code;
     var map = codeBits.map;
