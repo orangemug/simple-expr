@@ -65,9 +65,9 @@ async function update() {
     var tokens = simpleExpr.tokenize(input);
     var ast = simpleExpr.parse(tokens);
 
-    const formattedAst = formatAst(ast);
+    // const formattedAst = formatAst(ast);
 
-    var newTokens = simpleExpr.unparse(formattedAst);
+    var newTokens = simpleExpr.unparse(ast);
     var codeBits = simpleExpr.untokenize(newTokens);
     var code = codeBits.code;
     var map = codeBits.map;
