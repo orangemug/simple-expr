@@ -200,6 +200,71 @@ const tests = [
     `,
     throw: true
   },
+  {
+    name: "arithmetic: basic '+'",
+    input: `
+      foo(1 + 2)
+    `,
+    decompiled: `foo(1+2)`,
+    output: ["foo", ["+", 1, 2]]
+  },
+  {
+    name: "arithmetic: basic '-'",
+    input: `
+      foo(1 - 2)
+    `,
+    decompiled: `foo(1-2)`,
+    output: ["foo", ["-", 1, 2]]
+  },
+  {
+    name: "arithmetic: basic '*'",
+    input: `
+      foo(1 * 2)
+    `,
+    decompiled: `foo(1*2)`,
+    output: ["foo", ["*", 1, 2]]
+  },
+  {
+    name: "arithmetic: basic '/'",
+    input: `
+      foo(1 / 2)
+    `,
+    decompiled: `foo(1/2)`,
+    output: ["foo", ["/", 1, 2]]
+  },
+  {
+    name: "arithmetic: basic '%'",
+    input: `
+      foo(1 % 2)
+    `,
+    decompiled: `foo(1%2)`,
+    output: ["foo", ["%", 1, 2]]
+  },
+  {
+    name: "arithmetic: basic '^'",
+    input: `
+      foo(1 ^ 2)
+    `,
+    decompiled: `foo(1^2)`,
+    output: ["foo", ["^", 1, 2]]
+  },
+  {
+    name: "arithmetic: basic '^' no spaces",
+    skip: true,
+    input: `
+      foo(1^2)
+    `,
+    decompiled: `foo(1^2)`,
+    output: ["foo", ["^", 1, 2]]
+  },
+  {
+    name: "arithmetic: advanced",
+    input: `
+      number(1 + (2 / 3))
+    `,
+    decompiled: `number(1+(2/3))`,
+    output: ["number", ["+", 1, ["/", 2, 3]]]
+  },
 ]
 
 var awkwardNames = [
@@ -210,12 +275,12 @@ var awkwardNames = [
   {name: "=="},
   {name: ">"},
   {name: ">="},
-  {name: "-", skip: true},
-  {name: "*"},
-  {name: "/"},
-  {name: "%"},
-  {name: "^"},
-  {name: "+", skip: true},
+  // {name: "-", skip: true},
+  // {name: "*"},
+  // {name: "/"},
+  // {name: "%"},
+  // {name: "^"},
+  // {name: "+", skip: true},
   {name: "e"}
 ];
 awkwardNames.forEach(function(def) {
@@ -269,6 +334,26 @@ function buildTest(test, runner) {
   }
 }
 
+
+describe("compile-stub", function() {
+  it.skip("test", function() {
+    const input = "   a(2 + 2)   "
+    var tokens = simpleExpr.tokenize(input);
+    console.log(">> tokens", tokens);
+
+    var ast = simpleExpr.parse(tokens);
+    console.log(">> ast", ast);
+
+    const mglJSON = simpleExpr.transform(ast);
+    console.log(">> mglJSON", mglJSON);
+
+    var untokens = simpleExpr.unparse(ast);
+    console.log(">> untokens", untokens);
+
+    var revertedInput = simpleExpr.untokenize(untokens);
+    console.log(">> revertedInput", revertedInput);
+  })
+})
 
 describe("simple-expr", function() {
   describe("compile", function() {
